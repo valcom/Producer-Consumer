@@ -12,6 +12,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope("prototype")
-public class Producer extends Thread {
-
+public class Producer implements Runnable {
+	@Override
+	public void run() {
+	
+	}
+	
 }

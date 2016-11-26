@@ -19,7 +19,6 @@
 		<property name="waitForTasksToCompleteOnShutdown" value="true" />
 	</bean>
 
-
 	<aop:aspectj-autoproxy />
 
 </beans>

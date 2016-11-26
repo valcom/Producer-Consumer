@@ -12,6 +12,13 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope("prototype")
-public class Consumer extends Thread {
+public class Consumer implements Runnable {
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+	}
+	
+	
 
 }
