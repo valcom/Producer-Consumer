@@ -60,6 +60,9 @@ public class TestProducerConsumer {
 	@Before
 	public void initTest() throws Exception{
 		broker = BrokerFactory.createBroker(new URI(brokerUrl));
+		broker.setUseJmx(false);
+		broker.setPersistent(false);
+		broker.setUseShutdownHook(false);
 		broker.start();
 	}
 	
