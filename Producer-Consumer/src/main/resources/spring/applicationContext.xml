@@ -9,15 +9,45 @@
 						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
 						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
-	<context:component-scan base-package="producer_consumer" />
 
 	<context:annotation-config />
+	
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" >
+		<property name="location" value="classpath:/properties/config.properties"/>
+	</bean>
 
 	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
 		<property name="corePoolSize" value="5" />
 		<property name="maxPoolSize" value="10" />
 		<property name="waitForTasksToCompleteOnShutdown" value="true" />
+		<property name="awaitTerminationSeconds" value="60"/>
 	</bean>
+
+
+	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="${url}"/>
+    </bean>
+
+    <bean id="messageDestination" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg value="messageQueue1" />
+    </bean>
+
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="connectionFactory" />
+        <property name="receiveTimeout" value="10000" />
+    </bean>
+    
+    <bean id="producer" class="producer_consumer.Producer" scope="prototype">
+    	<property name="connectionFactory" ref="connectionFactory"/>
+    	<property name="jmsTemplate" ref="jmsTemplate"/>
+    </bean>
+    
+     <bean id="consumer" class="producer_consumer.Consumer" scope="prototype">
+    	<property name="connectionFactory" ref="connectionFactory"/>
+    	<property name="jmsTemplate" ref="jmsTemplate"/>
+    </bean>
+    
+	<context:component-scan base-package="producer_consumer" />
 
 	<aop:aspectj-autoproxy />
 

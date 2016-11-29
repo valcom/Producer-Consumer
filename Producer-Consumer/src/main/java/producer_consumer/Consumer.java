@@ -3,20 +3,24 @@
  */
 package producer_consumer;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import org.springframework.jms.core.support.JmsGatewaySupport;
 
 /**
  * @author vcompagnone
  *
  */
-@Component
-@Scope("prototype")
-public class Consumer implements Runnable {
+public class Consumer extends JmsGatewaySupport implements Runnable {
+	
+	public final static int MAX_IDLE_TIME = 5000;
 
+	
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
+		try {
+			Thread.sleep((long) (Math.random()*MAX_IDLE_TIME));
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	

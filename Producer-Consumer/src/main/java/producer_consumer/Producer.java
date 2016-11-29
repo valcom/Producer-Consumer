@@ -3,16 +3,13 @@
  */
 package producer_consumer;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import org.springframework.jms.core.support.JmsGatewaySupport;
 
 /**
  * @author vcompagnone
  *
  */
-@Component
-@Scope("prototype")
-public class Producer implements Runnable {
+public class Producer extends JmsGatewaySupport implements Runnable {
 	@Override
 	public void run() {
 	
