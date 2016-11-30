@@ -17,11 +17,14 @@ public class Consumer implements MessageListener,Runnable {
 	
 	private JmsTemplate jmsTemplate;
 	
+	private final long sleepTime  =(long) (1000*Math.random());
+	
 	@Override
 	public void onMessage(Message message) {
 		try {
 			TextMessage textmessage = (TextMessage) message;
 			System.out.println("Testo del messaggio -> "+ textmessage.getText());
+			Thread.sleep(sleepTime);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

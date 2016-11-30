@@ -35,8 +35,9 @@ public class TestProducerConsumer {
 	public void test() throws InterruptedException {
 		
 		taskExecutor.execute(producer);	
-		
+		Thread.sleep(10000);
 		taskExecutor.shutdown();
+		
 		
 	}
 	
