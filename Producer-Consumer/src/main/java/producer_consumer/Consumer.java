@@ -23,7 +23,7 @@ public class Consumer implements MessageListener,Runnable {
 	public void onMessage(Message message) {
 		try {
 			TextMessage textmessage = (TextMessage) message;
-			System.out.println("Testo del messaggio -> "+ textmessage.getText());
+			System.out.println("Thread "+Thread.currentThread().getName()+"\tTesto del messaggio -> "+ textmessage.getText());
 			Thread.sleep(sleepTime);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -37,7 +37,7 @@ public class Consumer implements MessageListener,Runnable {
 		try{
 			Message message = jmsTemplate.receive();
 			TextMessage textmessage = (TextMessage) message ;
-			System.out.println("Testo del messaggio -> "+ textmessage.getText());
+			System.out.println("Thread "+Thread.currentThread().getName()+"\tTesto del messaggio -> "+ textmessage.getText());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

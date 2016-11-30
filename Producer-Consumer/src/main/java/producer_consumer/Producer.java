@@ -3,6 +3,9 @@
  */
 package producer_consumer;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -22,16 +25,20 @@ public class Producer implements Runnable {
 
 	@Autowired
 	private JmsTemplate jmsTemplate;
+	
+	@Autowired
+	private JmsTemplate jmsQueueTemplate;
 
 	@Override
 	public void run() {
 		try{
-			jmsTemplate.send(new TextMessageCreator("ciao"));
-			jmsTemplate.send(new TextMessageCreator("come"));
-			jmsTemplate.send(new TextMessageCreator("stai,"));
-			jmsTemplate.send(new TextMessageCreator("tutto"));
-			jmsTemplate.send(new TextMessageCreator("bene?"));
-			jmsTemplate.send(new TextMessageCreator(endMessage));
+			
+			List<TextMessageCreator> textMessageCreators = Arrays.asList(new TextMessageCreator("ciao"),
+					new TextMessageCreator("come"),new TextMessageCreator("stai,"),new TextMessageCreator("tutto"),new TextMessageCreator("bene?"),new TextMessageCreator(endMessage));
+			
+			textMessageCreators.forEach(m->jmsTemplate.send(m));
+			textMessageCreators.forEach(m->jmsQueueTemplate.send(m));
+
 		}catch(Exception e){
 			e.printStackTrace();
 		}
