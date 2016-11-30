@@ -1,53 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:amq="http://activemq.apache.org/schema/core"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
-						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+						http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
 
 
 	<context:annotation-config />
-	
-	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" >
-		<property name="location" value="classpath:/properties/config.properties"/>
+	<context:component-scan base-package="producer_consumer" />
+
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:/properties/config.properties" />
 	</bean>
 
-	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+	<bean id="taskExecutor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
 		<property name="corePoolSize" value="5" />
 		<property name="maxPoolSize" value="10" />
 		<property name="waitForTasksToCompleteOnShutdown" value="true" />
-		<property name="awaitTerminationSeconds" value="60"/>
+		<property name="awaitTerminationSeconds" value="60" />
 	</bean>
 
 
-	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL" value="${url}"/>
-    </bean>
+	<amq:broker useJmx="false" persistent="false">
+		<amq:transportConnectors>
+			<amq:transportConnector uri="${url}" />
+		</amq:transportConnectors>
+	</amq:broker>
 
-    <bean id="messageDestination" class="org.apache.activemq.command.ActiveMQQueue">
-        <constructor-arg value="messageQueue1" />
-    </bean>
+	
+	<amq:connectionFactory id="jmsFactory" brokerURL="${url}"/>
+	
 
-    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
-        <property name="connectionFactory" ref="connectionFactory" />
-        <property name="receiveTimeout" value="10000" />
-    </bean>
-    
-    <bean id="producer" class="producer_consumer.Producer" scope="prototype">
-    	<property name="connectionFactory" ref="connectionFactory"/>
-    	<property name="jmsTemplate" ref="jmsTemplate"/>
-    </bean>
-    
-     <bean id="consumer" class="producer_consumer.Consumer" scope="prototype">
-    	<property name="connectionFactory" ref="connectionFactory"/>
-    	<property name="jmsTemplate" ref="jmsTemplate"/>
-    </bean>
-    
-	<context:component-scan base-package="producer_consumer" />
+	<bean id="queueDestination" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="messageQueue" />
+	</bean>
+
+	<bean id="topicDestination" class="org.apache.activemq.command.ActiveMQTopic">
+		<constructor-arg value="messageTopic" />
+	</bean>
+
+	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<property name="connectionFactory" ref="jmsFactory" />
+		<property name="receiveTimeout" value="10000" />
+		<property name="defaultDestinationName" value="messageTopic" />
+		<property name="pubSubDomain" value="true" />
+	</bean>
+
+	<!-- this is the Message Driven POJO (MDP) -->
+	<bean id="messageListener" class="producer_consumer.Consumer" scope="prototype">
+		<property name="jmsTemplate" ref="jmsTemplate"/>
+	</bean>
+
+	<!-- and this is the message listener container -->
+	<bean id="jmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="jmsFactory" />
+		<property name="destination" ref="topicDestination" />
+		<property name="messageListener" ref="messageListener" />
+	</bean>
+
+	<!-- and this is the message listener container -->
+	<bean id="jmsContainer2" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="jmsFactory" />
+		<property name="destination" ref="topicDestination" />
+		<property name="messageListener" ref="messageListener" />
+	</bean>
+	
+	<!-- and this is the message listener container -->
+	<bean id="jmsContaine3" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="jmsFactory" />
+		<property name="destination" ref="topicDestination" />
+		<property name="messageListener" ref="messageListener" />
+	</bean>
+	
 
 	<aop:aspectj-autoproxy />
 

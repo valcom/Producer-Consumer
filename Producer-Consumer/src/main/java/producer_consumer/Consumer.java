@@ -3,26 +3,52 @@
  */
 package producer_consumer;
 
-import org.springframework.jms.core.support.JmsGatewaySupport;
+import javax.jms.Message;
+import javax.jms.MessageListener;
+import javax.jms.TextMessage;
+
+import org.springframework.jms.core.JmsTemplate;
 
 /**
  * @author vcompagnone
  *
  */
-public class Consumer extends JmsGatewaySupport implements Runnable {
+public class Consumer implements MessageListener,Runnable {
 	
-	public final static int MAX_IDLE_TIME = 5000;
-
+	private JmsTemplate jmsTemplate;
 	
 	@Override
-	public void run() {
+	public void onMessage(Message message) {
 		try {
-			Thread.sleep((long) (Math.random()*MAX_IDLE_TIME));
-		} catch (InterruptedException e) {
+			TextMessage textmessage = (TextMessage) message;
+			System.out.println("Testo del messaggio -> "+ textmessage.getText());
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 	}
-	
-	
+
+	@Override
+	public void run() {
+
+		try{
+			Message message = jmsTemplate.receive();
+			TextMessage textmessage = (TextMessage) message ;
+			System.out.println("Testo del messaggio -> "+ textmessage.getText());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+
+
+	}
+
+	public JmsTemplate getJmsTemplate() {
+		return jmsTemplate;
+	}
+
+	public void setJmsTemplate(JmsTemplate jmsTemplate) {
+		this.jmsTemplate = jmsTemplate;
+	}
 
 }
