@@ -10,18 +10,18 @@
 	</appender>
 	
 	 <!--Daily rolling file appender -->
-	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<File>producer_consumer\log\producer_consumer.log</File>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<FileNamePattern>producer_consumer\log\history\%d{yyyy,aux}\%d{MMM,aux}\producer_consumer.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
-			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-				<maxFileSize>5MB</maxFileSize>
-			</timeBasedFileNamingAndTriggeringPolicy>
-		</rollingPolicy>
-		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
-		</encoder>
-	</appender>
+<!-- 	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender"> -->
+<!-- 		<File>producer_consumer\log\producer_consumer.log</File> -->
+<!-- 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy"> -->
+<!-- 			<FileNamePattern>producer_consumer\log\history\%d{yyyy,aux}\%d{MMM,aux}\producer_consumer.%d{yyyy-MM-dd}.%i.log</FileNamePattern> -->
+<!-- 			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP"> -->
+<!-- 				<maxFileSize>5MB</maxFileSize> -->
+<!-- 			</timeBasedFileNamingAndTriggeringPolicy> -->
+<!-- 		</rollingPolicy> -->
+<!-- 		<encoder> -->
+<!-- 			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern> -->
+<!-- 		</encoder> -->
+<!-- 	</appender> -->
 	<root level="info">
 		<appender-ref ref="STDOUT" />
 <!-- 		<appender-ref ref="FILE" /> -->

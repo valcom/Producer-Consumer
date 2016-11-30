@@ -13,8 +13,7 @@
 	<context:annotation-config />
 	<context:component-scan base-package="producer_consumer" />
 
-	<bean
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="location" value="classpath:/properties/config.properties" />
 	</bean>
 
@@ -27,7 +26,7 @@
 	</bean>
 
 
-	<amq:broker useJmx="false" persistent="false">
+	<amq:broker useJmx="false" persistent="false" useShutdownHook="false">
 		<amq:transportConnectors>
 			<amq:transportConnector uri="${url}" />
 		</amq:transportConnectors>
