@@ -65,7 +65,7 @@
 		<property name="sessionTransacted" value="true"/>
 	</bean>
 
-	<jms:listener-container connection-factory="jmsPooledFactory" acknowledge="transacted" concurrency="1" destination-type="topic">
+	<jms:listener-container connection-factory="jmsPooledFactory" acknowledge="transacted" concurrency="1" destination-type="topic" container-type="default" error-handler="consumerErrorHandler">
     	<jms:listener destination="messageTopic" ref="consumer" />
     	<jms:listener destination="messageTopic" ref="consumer" />
     	<jms:listener destination="messageTopic" ref="consumer" />

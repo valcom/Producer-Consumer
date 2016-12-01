@@ -3,11 +3,15 @@
  */
 package producer_consumer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
@@ -20,24 +24,39 @@ import org.springframework.stereotype.Component;
 @Scope("prototype")
 public class Consumer implements Runnable, MessageListener {
 	
-	private static final double LIMIT = 0.5;
+	
+	private static final double LIMIT = 0.8;
 
 	@Autowired
 	private JmsTemplate jmsQueueTemplate;
+		
+	private List<String> listaMessaggi;
 	
-	private final long sleepTime  =(long) (1000*Math.random());
+	@Value("${endMessage}")
+	private String endMessage;
+
+	private final int name;
+	
+	private static int counter = 0;
+	
+	public Consumer() {
+		super();
+		listaMessaggi = new ArrayList<String>();
+		name = counter++;
+	}
+
+	
 	
 	public void onMessage(Message message) {
 		try {
 			TextMessage textmessage = (TextMessage) message;
 			generaEccezioneCasuale();
-
-			System.out.println("Thread "+Thread.currentThread().getName()+"\tTesto del messaggio -> "+ textmessage.getText());
-			Thread.sleep(sleepTime);
+			listaMessaggi.add(textmessage.getText());
+			if(endMessage.equals(textmessage.getText())){
+				stampaLista();
+			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new RuntimeException(e.getMessage());
-
 		}
 		
 	}
@@ -45,7 +64,7 @@ public class Consumer implements Runnable, MessageListener {
 	private void generaEccezioneCasuale() {
 
 		if(Math.random()>LIMIT){
-			throw new RuntimeException("eccezione test");
+			throw new RuntimeException("eccezione test "+name);
 		}
 		
 		
@@ -53,18 +72,26 @@ public class Consumer implements Runnable, MessageListener {
 
 	@Override
 	public void run() {
-
 		try{
 			Message message = jmsQueueTemplate.receive();
 			TextMessage textmessage = (TextMessage) message ;
-			System.out.println("Thread "+Thread.currentThread().getName()+"\tTesto del messaggio -> "+ textmessage.getText());
+			listaMessaggi.add(textmessage.getText());
+			
+			if(endMessage.equals(textmessage.getText())){
+				stampaLista();
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-
-
 	}
+
+	public void stampaLista(){
+		System.out.println("Lista Messaggi "+name);
+		listaMessaggi.forEach(m->System.out.println(m));
+	}
+	
 
 
 }

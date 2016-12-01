@@ -36,9 +36,8 @@ public class TestProducerConsumer {
 		
 		taskExecutor.execute(producer);	
 		Thread.sleep(10000);
-		taskExecutor.shutdown();
-		
-		
+
+		taskExecutor.shutdown();	
 	}
 	
 	@After
