@@ -2,12 +2,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:amq="http://activemq.apache.org/schema/core"
+	xmlns:amq="http://activemq.apache.org/schema/core" xmlns:jms="http://www.springframework.org/schema/jms"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
 						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
-						http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
+						http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd
+						http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd">
 
 
 	<context:annotation-config />
@@ -26,14 +27,19 @@
 	</bean>
 
 
-	<amq:broker useJmx="false" persistent="false" useShutdownHook="false">
+	<amq:broker useJmx="false"  persistent="false" useShutdownHook="false" >
 		<amq:transportConnectors>
 			<amq:transportConnector uri="${url}" />
 		</amq:transportConnectors>
 	</amq:broker>
-
 	
-	<amq:connectionFactory id="jmsFactory" brokerURL="${url}"/>
+	<bean id="jmsPooledFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+		<constructor-arg ref="jmsFactory" />
+	</bean>
+
+	<bean id="jmsFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+		<property name="brokerURL" value="${url}"/>
+	</bean>
 	
 
 	<bean id="queueDestination" class="org.apache.activemq.command.ActiveMQQueue">
@@ -45,45 +51,25 @@
 	</bean>
 
 	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
-		<property name="connectionFactory" ref="jmsFactory" />
+		<property name="connectionFactory" ref="jmsPooledFactory" />
 		<property name="receiveTimeout" value="10000" />
 		<property name="defaultDestinationName" value="messageTopic" />
 		<property name="pubSubDomain" value="true" />
 	</bean>
-	
+
 	<bean id="jmsQueueTemplate" class="org.springframework.jms.core.JmsTemplate">
 		<property name="connectionFactory" ref="jmsFactory" />
 		<property name="receiveTimeout" value="10000" />
 		<property name="defaultDestinationName" value="messageQueue" />
 		<property name="pubSubDomain" value="false" />
+		<property name="sessionTransacted" value="true"/>
 	</bean>
 
-	<!-- this is the Message Driven POJO (MDP) -->
-	<bean id="consumer" class="producer_consumer.Consumer" scope="prototype">
-		<property name="jmsTemplate" ref="jmsQueueTemplate"/>
-	</bean>
-
-	<!-- and this is the message listener container -->
-	<bean id="jmsContainer1" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
-		<property name="connectionFactory" ref="jmsFactory" />
-		<property name="destination" ref="topicDestination" />
-		<property name="messageListener" ref="consumer" />
-	</bean>
-
-	<!-- and this is the message listener container -->
-	<bean id="jmsContainer2" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
-		<property name="connectionFactory" ref="jmsFactory" />
-		<property name="destination" ref="topicDestination" />
-		<property name="messageListener" ref="consumer" />
-	</bean>
-	
-	<!-- and this is the message listener container -->
-	<bean id="jmsContainer3" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
-		<property name="connectionFactory" ref="jmsFactory" />
-		<property name="destination" ref="topicDestination" />
-		<property name="messageListener" ref="consumer" />
-	</bean>
-	
+	<jms:listener-container connection-factory="jmsPooledFactory" acknowledge="transacted" concurrency="1" destination-type="topic">
+    	<jms:listener destination="messageTopic" ref="consumer" />
+    	<jms:listener destination="messageTopic" ref="consumer" />
+    	<jms:listener destination="messageTopic" ref="consumer" />
+	</jms:listener-container>
 
 	<aop:aspectj-autoproxy />
 
