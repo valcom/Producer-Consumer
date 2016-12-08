@@ -35,14 +35,14 @@ public class Consumer implements Runnable, MessageListener {
 	@Value("${endMessage}")
 	private String endMessage;
 
-	private final int name;
+	private final String name;
 	
 	private static int counter = 0;
 	
 	public Consumer() {
 		super();
 		listaMessaggi = new ArrayList<String>();
-		name = counter++;
+		name = "Consumer "+counter++;
 	}
 
 	

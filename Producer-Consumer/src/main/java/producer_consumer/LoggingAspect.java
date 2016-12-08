@@ -10,6 +10,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 
@@ -40,6 +41,9 @@ public class LoggingAspect {
 	@Before(value = POINTCUT)
 	public void beforeLog(JoinPoint jp){
 		final Logger logger = LoggerFactory.getLogger(jp.getTarget().getClass());
+		Thread t = Thread.currentThread();
+		MDC.put("logFileName", "Thread-"+t.getId());
+
 		if(logger.isDebugEnabled()){
 			logger.debug("Inizio metodo {}",jp.getSignature());
 			if(logger.isTraceEnabled()){
@@ -49,30 +53,37 @@ public class LoggingAspect {
 				}
 			}
 		}
-		
+		MDC.remove("logFileName");
+
 	}
 	
 	
 	@AfterReturning(pointcut= POINTCUT,returning="result")
 	public void afterReturningLog(JoinPoint jp,Object result){
 		final Logger logger = LoggerFactory.getLogger(jp.getTarget().getClass());
+		Thread t = Thread.currentThread();
+		MDC.put("logFileName", "Thread-"+t.getId());
 		if(logger.isDebugEnabled()){
 			logger.debug("Fine Metodo {}",jp.getSignature());
 			if(logger.isTraceEnabled()&&result!=null){
 				logger.trace("output = {}",result.toString());
 			}
 		}
+		MDC.remove("logFileName");
+
 	}
 
 	@AfterThrowing(pointcut=POINTCUT,throwing="e")
 	public void afterThrowingLog(JoinPoint jp,Throwable e) throws Throwable{
 		final Logger logger = LoggerFactory.getLogger(jp.getTarget().getClass());
-
+		Thread t = Thread.currentThread();
+		MDC.put("logFileName", "Thread-"+t.getId());
 		logger.error(e.getMessage(),e);
 		StringBuilder input = buildInput(jp.getArgs());
 		if(input != null){
 			logger.error("input = {}",input);
 		}
+		MDC.remove("logFileName");
 		throw e;
 	}
 	

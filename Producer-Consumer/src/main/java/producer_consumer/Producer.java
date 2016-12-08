@@ -28,6 +28,14 @@ public class Producer implements Runnable {
 	
 	@Autowired
 	private JmsTemplate jmsQueueTemplate;
+	
+	
+	private String name;
+
+	public Producer() {
+		super();
+		name="Producer";	
+	}
 
 	@Override
 	public void run() {
@@ -51,6 +59,10 @@ public class Producer implements Runnable {
 
 	public void setJmsTemplate(JmsTemplate jmsTemplate) {
 		this.jmsTemplate = jmsTemplate;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 
